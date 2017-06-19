@@ -35,6 +35,7 @@ public class EchoDialog : IDialog<object>
         var message = await argument;
         var appId = ConfigurationManager.AppSettings["MicrosoftAppId"];
         var appPass = ConfigurationManager.AppSettings["MicrosoftAppPassword"];
+        var appBotId = ConfigurationManager.AppSettings["BotId"];
 
         if (message.Text == "reset")
         {
@@ -63,7 +64,7 @@ public class EchoDialog : IDialog<object>
             // Clean up the streams and the response.
             reader.Close();
             response.Close();
-            await context.PostAsync($"{this.count++}: Your Message (2.1): {responseFromServer} ->" + appId);
+            await context.PostAsync($"[{this.appBotId}] Message: {this.count++} -> {responseFromServer} ->");
             context.Wait(MessageReceivedAsync);
         }
     }
