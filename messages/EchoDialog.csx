@@ -64,7 +64,8 @@ public class EchoDialog : IDialog<object>
             // Clean up the streams and the response.
             reader.Close();
             response.Close();
-            await context.PostAsync($"[" + this.appBotId + "] Message: " + this.count++ + " -> " + responseFromServer);
+            await context.PostAsync($"{this.count++}: Your Message: {responseFromServer}");
+            //await context.PostAsync($"[" + this.appBotId + "] Message: " + this.count++ + " -> " + responseFromServer);
             context.Wait(MessageReceivedAsync);
         }
     }
