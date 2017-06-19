@@ -36,8 +36,8 @@ public class EchoDialog : IDialog<object>
         var appId = ConfigurationManager.AppSettings["MicrosoftAppId"];
         var appPass = ConfigurationManager.AppSettings["MicrosoftAppPassword"];
         var appBotId = ConfigurationManager.AppSettings["BotId"];
-        DateTime dt_messageReceivedInicio = DateTime.Now;
-        DateTime dt_messageReceivedFim = DateTime.Now;
+        DateTime dt_messageReceivedInicio;
+        DateTime dt_messageReceivedFim;
 
         if (message.Text == "reset")
         {
@@ -50,6 +50,7 @@ public class EchoDialog : IDialog<object>
         }
         else
         {
+            dt_messageReceivedInicio = DateTime.Now;
             WebRequest request = WebRequest.Create("https://olosrepeaterfunction.azurewebsites.net/api/HttpTriggerCSharp1?code=ylw6l1SXaU6SqAae/4ee/Vq6fjNU6lYBXMdWTWeWPL8gznaLgHgaMA==&message=" + message.Text);
             // Get the response.
             WebResponse response = request.GetResponse();
