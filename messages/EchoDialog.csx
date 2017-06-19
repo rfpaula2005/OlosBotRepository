@@ -36,8 +36,8 @@ public class EchoDialog : IDialog<object>
         var appId = ConfigurationManager.AppSettings["MicrosoftAppId"];
         var appPass = ConfigurationManager.AppSettings["MicrosoftAppPassword"];
         var appBotId = ConfigurationManager.AppSettings["BotId"];
-        DateTime dt_messageReceivedInicio = DateTime.Now();
-        DateTime dt_messageReceivedFim = null;
+        DateTime dt_messageReceivedInicio = DateTime.Now;
+        DateTime dt_messageReceivedFim = DateTime.Now;
 
         if (message.Text == "reset")
         {
@@ -66,10 +66,9 @@ public class EchoDialog : IDialog<object>
             // Clean up the streams and the response.
             reader.Close();
             response.Close();
-            dt_messageReceivedFim = DateTime.Now();
+            dt_messageReceivedFim = DateTime.Now;
             //await context.PostAsync($"{this.count++}: Your Message: {responseFromServer}");
-            await context.PostAsync($"[{appBotId}] Message Count: {this.count++} -> {responseFromServer}");
-            await context.PostAsync($"[Duração Message ({this.count})]:  -> {dt_messageReceivedFim.ToString()} - {dt_messageReceivedInicio.ToString()}");
+            await context.PostAsync($"Message Count: {this.count++} \n\n Bot ID: {appBotId} \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
             context.Wait(MessageReceivedAsync);
         }
     }
