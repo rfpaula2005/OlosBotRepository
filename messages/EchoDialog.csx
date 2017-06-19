@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System.Net;
+using System.Configuration;
+
 
 // For more information about this template visit http://aka.ms/azurebots-csharp-basic
 [Serializable]
@@ -31,6 +33,9 @@ public class EchoDialog : IDialog<object>
     public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
     {
         var message = await argument;
+        var appId = ConfigurationManager.AppSettings["MicrosoftAppId"];
+        var appPass = ConfigurationManager.AppSettings["MicrosoftAppPassword"];
+
         if (message.Text == "reset")
         {
             PromptDialog.Confirm(
@@ -58,7 +63,7 @@ public class EchoDialog : IDialog<object>
             // Clean up the streams and the response.
             reader.Close();
             response.Close();
-            await context.PostAsync($"{this.count++}: Your Message (2): {responseFromServer}");
+            await context.PostAsync($"{this.count++}: Your Message (2): {responseFromServer} ->" + appId);
             context.Wait(MessageReceivedAsync);
         }
     }
