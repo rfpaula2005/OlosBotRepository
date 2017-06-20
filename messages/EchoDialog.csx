@@ -50,27 +50,90 @@ public class EchoDialog : IDialog<object>
         }
         else
         {
-            dt_messageReceivedInicio = DateTime.Now;
-            WebRequest request = WebRequest.Create("https://olosrepeaterfunction.azurewebsites.net/api/HttpTriggerCSharp1?code=ylw6l1SXaU6SqAae/4ee/Vq6fjNU6lYBXMdWTWeWPL8gznaLgHgaMA==&message=" + message.Text);
-            // Get the response.
-            WebResponse response = request.GetResponse();
-            // Display the status.
-            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-            // Get the stream containing content returned by the server.
-            Stream dataStream = response.GetResponseStream();
-            // Open the stream using a StreamReader for easy access.
-            StreamReader reader = new StreamReader(dataStream);
-            // Read the content.
-            string responseFromServer = reader.ReadToEnd();
-            // Display the content.
-            Console.WriteLine(responseFromServer);
-            // Clean up the streams and the response.
-            reader.Close();
-            response.Close();
-            dt_messageReceivedFim = DateTime.Now;
-            //await context.PostAsync($"{this.count++}: Your Message: {responseFromServer}");
-            await context.PostAsync($"Message Count: {this.count++} \n\n Bot ID: {appBotId} \n\n appId: [{appId}] \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
-            context.Wait(MessageReceivedAsync);
+            try
+            {
+                dt_messageReceivedInicio = DateTime.Now;
+                WebRequest request = WebRequest.Create("https://olosrepeaterfunction.azurewebsites.net/api/HttpTriggerCSharp1?code=ylw6l1SXaU6SqAae/4ee/Vq6fjNU6lYBXMdWTWeWPL8gznaLgHgaMA==&message=" + message.Text);
+                // Get the response.
+                WebResponse response = request.GetResponse();
+                // Display the status.
+                Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+
+                switch (((HttpWebResponse)response).StatusCode)
+                {
+                    // OK
+                    case HttpStatusCode.NoContent:
+                    case HttpStatusCode.OK:
+                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        // Get the stream containing content returned by the server.
+                        Stream dataStream = response.GetResponseStream();
+                        // Open the stream using a StreamReader for easy access.
+                        StreamReader reader = new StreamReader(dataStream);
+                        // Read the content.
+                        string responseFromServer = reader.ReadToEnd();
+                        // Display the content.
+                        Console.WriteLine(responseFromServer);
+                        // Clean up the streams and the response.
+                        reader.Close();
+                        response.Close();
+                        dt_messageReceivedFim = DateTime.Now;
+                        await context.PostAsync($"Message Count: {this.count++} \n\n Bot ID: {appBotId} \n\n appId: [{appId}] \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
+                        context.Wait(MessageReceivedAsync);
+                        break;
+                    // Server Problems
+                    case HttpStatusCode.ServiceUnavailable:
+                    case HttpStatusCode.RequestTimeout:
+                    case HttpStatusCode.RequestEntityTooLarge:
+                    case HttpStatusCode.NotImplemented:
+                    case HttpStatusCode.NotAcceptable:
+                    case HttpStatusCode.NotFound:
+                    case HttpStatusCode.GatewayTimeout:
+                    case HttpStatusCode.Conflict:
+                    case HttpStatusCode.InternalServerError:
+                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
+                        context.Wait(MessageReceivedAsync);
+                        break;
+                    // Request Problems
+                    case HttpStatusCode.Ambiguous:
+                    case HttpStatusCode.LengthRequired:
+                    case HttpStatusCode.Gone:
+                    case HttpStatusCode.Forbidden:
+                    case HttpStatusCode.Unauthorized:
+                    case HttpStatusCode.MethodNotAllowed:
+                    case HttpStatusCode.ProxyAuthenticationRequired:
+                    case HttpStatusCode.BadRequest:
+                    case HttpStatusCode.ResetContent:
+                    // Network Problems
+                    case HttpStatusCode.BadGateway:
+                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
+                        context.Wait(MessageReceivedAsync);
+                        break;
+                    // Network Redirects
+                    case HttpStatusCode.Redirect:
+                    case HttpStatusCode.SeeOther:
+                    case HttpStatusCode.RedirectMethod:
+                    case HttpStatusCode.TemporaryRedirect:
+                    case HttpStatusCode.Moved:
+                    case HttpStatusCode.MovedPermanently:
+                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        await context.PostAsync($"Verificar o comportamento em caso de redirect.");
+                        context.Wait(MessageReceivedAsync);
+                        break;
+                    default:
+                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
+                        context.Wait(MessageReceivedAsync);
+                        break;
+                }
+
+            }
+            catch
+            {
+
+            }
+
         }
     }
 
