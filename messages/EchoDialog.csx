@@ -4,6 +4,8 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System.Net;
 using System.Configuration;
+using System.Diagnostics;
+using Microsoft.Azure.WebJobs.Host;
 
 
 // For more information about this template visit http://aka.ms/azurebots-csharp-basic
@@ -57,14 +59,14 @@ public class EchoDialog : IDialog<object>
                 // Get the response.
                 WebResponse response = request.GetResponse();
                 // Display the status.
-                Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+                Debug.WriteLine(((HttpWebResponse)response).StatusDescription);
 
                 switch (((HttpWebResponse)response).StatusCode)
                 {
                     // OK
                     case HttpStatusCode.NoContent:
                     case HttpStatusCode.OK:
-                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
                         // Get the stream containing content returned by the server.
                         Stream dataStream = response.GetResponseStream();
                         // Open the stream using a StreamReader for easy access.
@@ -72,7 +74,7 @@ public class EchoDialog : IDialog<object>
                         // Read the content.
                         string responseFromServer = reader.ReadToEnd();
                         // Display the content.
-                        Console.WriteLine(responseFromServer);
+                        Debug.WriteLine(responseFromServer);
                         // Clean up the streams and the response.
                         reader.Close();
                         response.Close();
@@ -90,7 +92,7 @@ public class EchoDialog : IDialog<object>
                     case HttpStatusCode.GatewayTimeout:
                     case HttpStatusCode.Conflict:
                     case HttpStatusCode.InternalServerError:
-                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
                         await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
                         context.Wait(MessageReceivedAsync);
                         break;
@@ -106,28 +108,25 @@ public class EchoDialog : IDialog<object>
                     case HttpStatusCode.ResetContent:
                     // Network Problems
                     case HttpStatusCode.BadGateway:
-                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
                         await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
                         context.Wait(MessageReceivedAsync);
                         break;
                     // Network Redirects
                     case HttpStatusCode.Redirect:
-                    case HttpStatusCode.SeeOther:
                     case HttpStatusCode.RedirectMethod:
                     case HttpStatusCode.TemporaryRedirect:
-                    case HttpStatusCode.Moved:
                     case HttpStatusCode.MovedPermanently:
-                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
                         await context.PostAsync($"Verificar o comportamento em caso de redirect.");
                         context.Wait(MessageReceivedAsync);
                         break;
                     default:
-                        log.Info($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
+                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
                         await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
                         context.Wait(MessageReceivedAsync);
                         break;
                 }
-
             }
             catch
             {
