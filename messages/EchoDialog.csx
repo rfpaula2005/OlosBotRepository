@@ -4,8 +4,8 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System.Net;
 using System.Configuration;
-using System.Diagnostics;
-using Microsoft.Azure.WebJobs.Host;
+using System.Text.RegularExpressions;
+
 
 
 // For more information about this template visit http://aka.ms/azurebots-csharp-basic
@@ -40,6 +40,7 @@ public class EchoDialog : IDialog<object>
         var appBotId = ConfigurationManager.AppSettings["BotId"];
         DateTime dt_messageReceivedInicio;
         DateTime dt_messageReceivedFim;
+        string http_code;
 
         if (message.Text == "reset")
         {
@@ -55,82 +56,36 @@ public class EchoDialog : IDialog<object>
             try
             {
                 dt_messageReceivedInicio = DateTime.Now;
-                WebRequest request = WebRequest.Create("https://olosrepeaterfunction.azurewebsites.net/api/HttpTriggerCSharp1?code=ylw6l1SXaU6SqAae/4ee/Vq6fjNU6lYBXMdWTWeWPL8gznaLgHgaMA==&message=" + message.Text);
+                string pattern = "(http_code=)([0-9][0-9][0-9])";
+                http_code = (Regex.Match(message.Text, pattern, RegexOptions.IgnoreCase)).Value;
+                string uri = "https://olosrepeaterfunction.azurewebsites.net/api/HttpTriggerCSharp1?code=ylw6l1SXaU6SqAae/4ee/Vq6fjNU6lYBXMdWTWeWPL8gznaLgHgaMA==&message=" + message.Text + "&" + http_code;
+
+                /*
+                WebRequest request = WebRequest.Create("https://olosrepeaterfunction.azurewebsites.net/api/HttpTriggerCSharp1?code=ylw6l1SXaU6SqAae/4ee/Vq6fjNU6lYBXMdWTWeWPL8gznaLgHgaMA==&message=" + message.Text + "&" + http_code);
                 // Get the response.
                 WebResponse response = request.GetResponse();
                 // Display the status.
-                Debug.WriteLine(((HttpWebResponse)response).StatusDescription);
-
-                switch (((HttpWebResponse)response).StatusCode)
-                {
-                    // OK
-                    case HttpStatusCode.NoContent:
-                    case HttpStatusCode.OK:
-                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
-                        // Get the stream containing content returned by the server.
-                        Stream dataStream = response.GetResponseStream();
-                        // Open the stream using a StreamReader for easy access.
-                        StreamReader reader = new StreamReader(dataStream);
-                        // Read the content.
-                        string responseFromServer = reader.ReadToEnd();
-                        // Display the content.
-                        Debug.WriteLine(responseFromServer);
-                        // Clean up the streams and the response.
-                        reader.Close();
-                        response.Close();
-                        dt_messageReceivedFim = DateTime.Now;
-                        await context.PostAsync($"Message Count: {this.count++} \n\n Bot ID: {appBotId} \n\n appId: [{appId}] \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
-                        context.Wait(MessageReceivedAsync);
-                        break;
-                    // Server Problems
-                    case HttpStatusCode.ServiceUnavailable:
-                    case HttpStatusCode.RequestTimeout:
-                    case HttpStatusCode.RequestEntityTooLarge:
-                    case HttpStatusCode.NotImplemented:
-                    case HttpStatusCode.NotAcceptable:
-                    case HttpStatusCode.NotFound:
-                    case HttpStatusCode.GatewayTimeout:
-                    case HttpStatusCode.Conflict:
-                    case HttpStatusCode.InternalServerError:
-                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
-                        await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
-                        context.Wait(MessageReceivedAsync);
-                        break;
-                    // Request Problems
-                    case HttpStatusCode.Ambiguous:
-                    case HttpStatusCode.LengthRequired:
-                    case HttpStatusCode.Gone:
-                    case HttpStatusCode.Forbidden:
-                    case HttpStatusCode.Unauthorized:
-                    case HttpStatusCode.MethodNotAllowed:
-                    case HttpStatusCode.ProxyAuthenticationRequired:
-                    case HttpStatusCode.BadRequest:
-                    case HttpStatusCode.ResetContent:
-                    // Network Problems
-                    case HttpStatusCode.BadGateway:
-                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
-                        await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
-                        context.Wait(MessageReceivedAsync);
-                        break;
-                    // Network Redirects
-                    case HttpStatusCode.Redirect:
-                    case HttpStatusCode.RedirectMethod:
-                    case HttpStatusCode.TemporaryRedirect:
-                    case HttpStatusCode.MovedPermanently:
-                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
-                        await context.PostAsync($"Verificar o comportamento em caso de redirect.");
-                        context.Wait(MessageReceivedAsync);
-                        break;
-                    default:
-                        Debug.WriteLine($"Resquest Status: CODE: {((HttpWebResponse)response).StatusCode} \n\n {((HttpWebResponse)response).StatusDescription}");
-                        await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.\n\nPor favor, retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.");
-                        context.Wait(MessageReceivedAsync);
-                        break;
-                }
+                // Get the stream containing content returned by the server.
+                Stream dataStream = response.GetResponseStream();
+                // Open the stream using a StreamReader for easy access.
+                StreamReader reader = new StreamReader(dataStream);
+                // Read the content.
+                string responseFromServer = reader.ReadToEnd();
+                // Display the content.
+                // Clean up the streams and the response.
+                reader.Close();
+                response.Close();
+                */
+                Task<string> getStringTask = Utils.AccessTheWebAsync(uri);
+                string responseFromServer = await getStringTask;
+                dt_messageReceivedFim = DateTime.Now;
+                await context.PostAsync($"Message Count: {this.count++} \n\n Bot ID: {appBotId} \n\n appId: [{appId}] \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
+                context.Wait(MessageReceivedAsync);
             }
-            catch
+            catch (WebException wex)
             {
-
+                await context.PostAsync($"Por favor me desculpe, no momento estamos passando por algumas dificuldades técnicas.Retorne mais tarde e teremos o maior prazer em ajudá-lo com a sua solicitação.\n\n Execption:\n\n" + wex.Message);
+                context.Wait(MessageReceivedAsync);
             }
 
         }
@@ -150,4 +105,20 @@ public class EchoDialog : IDialog<object>
         }
         context.Wait(MessageReceivedAsync);
     }
+
 }
+
+/*
+public class Utils
+{
+    public static async Task<string> AccessTheWebAsync(string uri)
+    {
+        HttpClient client = new HttpClient();
+
+        Task<string> getStringTask = client.GetStringAsync(uri);
+        string urlContents = await getStringTask;
+
+        return urlContents;
+    }
+}
+*/
