@@ -1,14 +1,15 @@
 #r "Newtonsoft.Json"
+#r "dll/Connection.dll"
 #load "EchoDialog.csx"
 
 using System;
 using System.Net;
 using System.Threading;
 using Newtonsoft.Json;
-
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using Devox.Connection;
 
 public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
 {
@@ -45,6 +46,7 @@ public static async Task<object> Run(HttpRequestMessage req, TraceWriter log)
                         var newMembers = update.MembersAdded?.Where(t => t.Id != activity.Recipient.Id);
                         foreach (var newMember in newMembers)
                         {
+                            DbConnection db = new DbConnection();
                             reply.Text = "Welcome";
                             if (!string.IsNullOrEmpty(newMember.Name))
                             {

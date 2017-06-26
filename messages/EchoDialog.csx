@@ -68,7 +68,7 @@ public class EchoDialog : IDialog<object>
             response.Close();
             dt_messageReceivedFim = DateTime.Now;
             //await context.PostAsync($"{this.count++}: Your Message: {responseFromServer}");
-            await context.PostAsync($"Message Count: {this.count++} \n\n Bot ID: {appBotId} \n\n appId: [{appId}] \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
+            await context.PostAsync($"Message Olos Count: {this.count++} \n\n Bot ID: {appBotId} \n\n appId: [{appId}] \n\n Duração: {(dt_messageReceivedInicio - dt_messageReceivedInicio).TotalSeconds} segundos \n\n {responseFromServer} ");
             context.Wait(MessageReceivedAsync);
         }
     }

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26606.0
+VisualStudioVersion = 15.0.26608.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "func", "..\..\AppData\Roaming\npm\node_modules\azure-functions-cli\bin\func.exe", "{C3D4B696-69FC-43D3-9DE6-21FEF4184A2B}"
 	ProjectSection(DebuggerProjectSystem) = preProject
@@ -9,7 +9,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "func", "..\..\AppData\Roami
 		RemoteMachine = THERMONSTER
 		StartingDirectory = 
 		Arguments = 
-		Environment = Padrão
+		Environment = Default
 		LaunchingEngine = fb0d4648-f776-4980-95f8-bb7f36ebc1ee
 		UseLegacyDebugEngines = No
 		LaunchSQLEngine = No
@@ -33,6 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{F4
 		messages\run.csx = messages\run.csx
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dll", "dll", "{15C522A4-E33B-4A80-BD3E-1C9B9325EACB}"
+	ProjectSection(SolutionItems) = preProject
+		messages\dll\Connection.dll = messages\dll\Connection.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,5 +56,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F4D9DF3B-F4E4-4E19-9053-3AF71A3189FA} = {36665A78-4D93-48C7-B432-4DA46AA140D5}
+		{15C522A4-E33B-4A80-BD3E-1C9B9325EACB} = {F4D9DF3B-F4E4-4E19-9053-3AF71A3189FA}
 	EndGlobalSection
 EndGlobal
